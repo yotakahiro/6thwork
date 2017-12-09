@@ -1,0 +1,58 @@
+<p id="notice"><%= notice %></p>
+<%= render_breadcrumbs separator:  '>' %>
+<p>
+  <strong>Name:</strong>
+  <%= @post.name %>
+</p>
+
+<p>
+  <strong>Price:</strong>
+  <%= @post.price %>円
+</p>
+
+<p>
+  <strong>Description:</strong>
+  <%= @post.description %>
+</p>
+
+<p>
+	<% if @post.post_images.present? %>
+		<% @post.post_images.each do |image| %>
+			<%= attachment_image_tag image, :image, :fill, 200, 200 %>
+
+		<% end %>
+	<% else %>
+			<%= image_tag 'face.jpg', size: '200x200' %>
+	<% end %>
+</p>
+<p>
+<strong>Category:</strong>
+	
+	<!-- リンク先にタグ名を渡し、タグ名のパスに飛ぶ。同時にタグ名でフィルタをかけ、該当する商品のみが羅列される -->
+	<% @post.category_list.each do |category| %>
+	<%= link_to category, search_path(category)%>
+	<% end %><br><br>
+	
+<strong>buy!</strong>
+<% if user_signed_in? %>
+	<%= button_to '購入フォームへ！', user_infos_new_path %>
+<% else %>
+	<%= button_to '購入手続きへ！', new_user_session_path %>
+<%= button_to_if user_signed_in?, '購入へ！', controller: :posts, action: :index do |name|
+	link_to '購入へ！', controller: :login, action: :info
+	end %>
+<a href="/users/sign_in">購入へ！</a>/<a href="/users/sign_in">マイページ</a>
+
+<!-- current_user.idがnilだったからエラーが起きた。deviseの設定でnilも許容変更しておく -->
+<!-- nilを許容変更しても、if文が成立しないから恐らくエラーが起きる -->
+
+<% if user_signed_in? %>
+	<% if current_user.id == @post.user.id %> 
+		<%= link_to 'Edit', edit_post_path(@post) %> | 
+		<%= link_to 'Destroy', @post, method: :delete, data: { confirm: 'Are you sure?' } %> | 
+	<% end %>
+<% end %>
+<%= render_breadcrumbs separator:  '>' %>
+	
+<%= link_to 'Back', posts_path %>
+
